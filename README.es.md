@@ -20,12 +20,24 @@ Para ejecutar sin Docker: instale Python 3.14, ejecute `python -m pip install -e
 - Endpoint: `GET /weather?city=Itajai`.
 - Geocodificación: se selecciona el primer resultado de Open-Meteo.
 - Caché: clave normalizada, TTL de 600 segundos por defecto y campo `cached`.
+- Métricas: `GET /metrics` muestra aciertos, fallos, errores y tasa de aciertos **por proceso** (se reinicia con el servidor).
+- Límite de solicitudes: 60 peticiones por 60 segundos por IP; devuelve HTTP 429 con `Retry-After`. Si Redis falla, el límite permite las solicitudes para mantener la disponibilidad.
 - Errores: 404 ciudad no encontrada; 422 entrada inválida; 502 respuesta externa inválida; 503 proveedor no disponible; 504 tiempo de espera agotado.
 - Pruebas sin conexión: `python -m pytest -q`.
 - Calidad: `ruff check .` y `ruff format --check .`.
 
+## Pruebas de integración y benchmark
+
+```bash
+docker compose up -d redis
+RUN_REDIS_TESTS=1 REDIS_TEST_URL=redis://localhost:6379/15 python -m pytest -q
+python scripts/benchmark.py --samples 30 --delay-ms 30
+```
+
+En PowerShell, configure `$env:RUN_REDIS_TESTS='1'` y `$env:REDIS_TEST_URL='redis://localhost:6379/15'` antes de ejecutar pytest. CI ejecuta las pruebas con Redis real. El benchmark mide latencia real de ejecución con Redis y un proveedor HTTP **simulado**, sin afirmar rendimiento de producción. El límite por IP usa el par ASGI, ignora cabeceras de proxy no confiables y permite solicitudes si Redis deja de funcionar.
+
 ## Alcance
 
-El Ciclo 1 implementa la base funcional. Las métricas de caché, los límites de frecuencia, las pruebas reales de caducidad en Redis y los benchmarks reproducibles corresponden al Ciclo 2. No se afirman mejoras de rendimiento no medidas. Consulte el [README principal](README.md) para arquitectura, un ejemplo JSON **ilustrativo** y decisiones técnicas.
+Los Ciclos 1 y 2 están implementados en la rama de revisión. No hay despliegue a producción. Consulte el [README en inglés](README.md) para arquitectura, ejemplo JSON **ilustrativo**, limitaciones y decisiones técnicas.
 
 Datos de [Open-Meteo](https://open-meteo.com/en/docs) sujetos a sus [condiciones](https://open-meteo.com/en/terms). Código MIT.
