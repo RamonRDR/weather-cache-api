@@ -34,7 +34,7 @@ RUN_REDIS_TESTS=1 REDIS_TEST_URL=redis://localhost:6379/15 python -m pytest -q
 python scripts/benchmark.py --samples 30 --delay-ms 30
 ```
 
-No PowerShell, configure `$env:RUN_REDIS_TESTS='1'` e `$env:REDIS_TEST_URL='redis://localhost:6379/15'` antes do pytest. O CI executa esses testes com Redis real. O benchmark usa Redis real e um provedor HTTP **simulado** para coletar latências observadas, sem afirmar desempenho em produção. O limite por IP depende do endereço ASGI, ignora cabeçalhos de proxy não confiáveis e falha aberto quando o Redis está indisponível.
+No PowerShell, configure `$env:RUN_REDIS_TESTS='1'` e `$env:REDIS_TEST_URL='redis://localhost:6379/15'` antes do pytest. O CI executa esses testes com Redis real. O benchmark usa Redis real e um provedor HTTP **simulado** para coletar latências observadas, sem afirmar desempenho em produção. Consulte os [resultados medidos no CI](docs/performance.md), com metodologia e limitações. O limite por IP depende do endereço ASGI, ignora cabeçalhos de proxy não confiáveis e falha aberto quando o Redis está indisponível.
 
 ## Escopo
 

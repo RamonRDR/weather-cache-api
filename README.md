@@ -113,7 +113,7 @@ python scripts/benchmark.py --samples 30 --delay-ms 30
 
 On Windows PowerShell, set environment variables with `$env:RUN_REDIS_TESTS='1'` and `$env:REDIS_TEST_URL='redis://localhost:6379/15'` before running pytest.
 
-The benchmark executes `WeatherService` with real Redis and an `httpx.MockTransport` provider delayed by the requested number of milliseconds. Each cold sample deletes its unique cache entry; warm samples reuse a seeded entry. It prints observed mean/p50/p95 and median ratio at runtime. **These figures are environment-dependent, synthetic, and not live Open-Meteo or end-to-end HTTP timings.** No fixed speedup is claimed.
+The benchmark executes `WeatherService` with real Redis and an `httpx.MockTransport` provider delayed by the requested number of milliseconds. Each cold sample deletes its unique cache entry; warm samples reuse a seeded entry. It prints observed mean/p50/p95 and median ratio at runtime. **These figures are environment-dependent, synthetic, and not live Open-Meteo or end-to-end HTTP timings.** No fixed speedup is claimed. See [measured CI benchmark results and methodology](docs/performance.md).
 
 ## Intentional limitations
 
