@@ -48,6 +48,7 @@ class WeatherResponse(BaseModel):
     source: str = "open-meteo"
     cached: bool = False
 
+
 class CacheMetricsResponse(BaseModel):
     cache_hits: int = Field(ge=0)
     cache_misses: int = Field(ge=0)
