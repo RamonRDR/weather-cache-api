@@ -22,7 +22,9 @@ from weather_cache_api.open_meteo import OpenMeteoClient
 from weather_cache_api.service import WeatherService
 
 GEO = {
-    "results": [{"name": "Benchmark City", "country": "Synthetic", "latitude": 0.0, "longitude": 0.0}]
+    "results": [
+        {"name": "Benchmark City", "country": "Synthetic", "latitude": 0.0, "longitude": 0.0}
+    ]
 }
 CURRENT = {
     "current": {
@@ -96,9 +98,11 @@ async def benchmark(samples: int, delay_ms: float, redis_url: str) -> dict[str, 
                 "simulated_delay_per_upstream_call_ms": delay_ms,
                 "uncached": cold_stats,
                 "cached": warm_stats,
-                "median_ratio": round(
-                    cold_stats["p50_ms"] / warm_stats["p50_ms"], 2
-                ) if warm_stats["p50_ms"] > 0 else None,
+                "median_ratio": (
+                    round(cold_stats["p50_ms"] / warm_stats["p50_ms"], 2)
+                    if warm_stats["p50_ms"] > 0
+                    else None
+                ),
                 "upstream_requests": provider_requests,
             }
     finally:

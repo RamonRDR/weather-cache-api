@@ -158,12 +158,18 @@ def test_openapi_schema_exposes_weather(setup_api):
 def test_cache_metrics_on_hit_and_miss(setup_api):
     client, _, _, _ = setup_api
     assert client.get("/metrics").json() == {
-        "cache_hits": 0, "cache_misses": 0, "cache_errors": 0, "hit_rate": 0.0
+        "cache_hits": 0,
+        "cache_misses": 0,
+        "cache_errors": 0,
+        "hit_rate": 0.0,
     }
     client.get("/weather", params={"city": "Itajai"})
     client.get("/weather", params={"city": "Itajai"})
     assert client.get("/metrics").json() == {
-        "cache_hits": 1, "cache_misses": 1, "cache_errors": 0, "hit_rate": 0.5
+        "cache_hits": 1,
+        "cache_misses": 1,
+        "cache_errors": 0,
+        "hit_rate": 0.5,
     }
 
 
@@ -172,7 +178,10 @@ def test_cache_metrics_count_redis_errors(setup_api):
     redis.fail = True
     client.get("/weather", params={"city": "Itajai"})
     assert client.get("/metrics").json() == {
-        "cache_hits": 0, "cache_misses": 1, "cache_errors": 2, "hit_rate": 0.0
+        "cache_hits": 0,
+        "cache_misses": 1,
+        "cache_errors": 2,
+        "hit_rate": 0.0,
     }
 
 
