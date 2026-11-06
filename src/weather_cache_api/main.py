@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 
 from weather_cache_api.cache import WeatherCache
 from weather_cache_api.config import Settings
+from weather_cache_api.limiter import RateLimiter
 from weather_cache_api.open_meteo import (
     CityNotFoundError,
     InvalidProviderResponseError,
@@ -16,7 +17,6 @@ from weather_cache_api.open_meteo import (
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
-from weather_cache_api.limiter import RateLimiter
 from weather_cache_api.schemas import CacheMetricsResponse, WeatherResponse
 from weather_cache_api.service import WeatherService
 
