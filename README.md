@@ -115,6 +115,12 @@ On Windows PowerShell, set environment variables with `$env:RUN_REDIS_TESTS='1'`
 
 The benchmark executes `WeatherService` with real Redis and an `httpx.MockTransport` provider delayed by the requested number of milliseconds. Each cold sample deletes its unique cache entry; warm samples reuse a seeded entry. It prints observed mean/p50/p95 and median ratio at runtime. **These figures are environment-dependent, synthetic, and not live Open-Meteo or end-to-end HTTP timings.** No fixed speedup is claimed. See [measured CI benchmark results and methodology](docs/performance.md).
 
+## Optional live-provider smoke test (GitHub Actions)
+
+The separate [Live Open-Meteo smoke test](.github/workflows/live-smoke.yml) runs on relevant pull-request changes and supports `workflow_dispatch` after the workflow exists on the default branch. It builds the full Compose stack, queries **Berlin** through real Open-Meteo geocoding and weather APIs, then verifies that a second `/weather` request is a Redis cache hit. Results appear in the workflow logs and job summary.
+
+This is an **advisory workflow**, not the required `quality` check. Live provider outages or rate limits can fail it without blocking merge; investigate any failure before approving a release. The workflow uses no API keys or secrets. For equivalent manual execution with running containers, use `python scripts/smoke_live.py --city Berlin`.
+
 ## Intentional limitations
 
 - When a name matches multiple locations, the first geocoding result is selected.

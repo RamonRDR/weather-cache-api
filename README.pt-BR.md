@@ -36,6 +36,10 @@ python scripts/benchmark.py --samples 30 --delay-ms 30
 
 No PowerShell, configure `$env:RUN_REDIS_TESTS='1'` e `$env:REDIS_TEST_URL='redis://localhost:6379/15'` antes do pytest. O CI executa esses testes com Redis real. O benchmark usa Redis real e um provedor HTTP **simulado** para coletar latências observadas, sem afirmar desempenho em produção. Consulte os [resultados medidos no CI](docs/performance.md), com metodologia e limitações. O limite por IP depende do endereço ASGI, ignora cabeçalhos de proxy não confiáveis e falha aberto quando o Redis está indisponível.
 
+## Teste real da Open-Meteo no GitHub Actions
+
+O workflow separado [Live Open-Meteo smoke test](.github/workflows/live-smoke.yml) sobe API e Redis via Docker Compose, consulta **Berlin** nas APIs reais de geocoding e previsão da Open-Meteo e verifica um segundo acesso servido pelo cache. É um teste **informativo** e não substitui o CI obrigatório `quality`, porque o provedor externo pode ficar indisponível. Executa em alterações relevantes do PR e pode ser iniciado manualmente após o workflow chegar à branch padrão. Não necessita de chaves ou segredos.
+
 ## Escopo
 
 Os Ciclos 1 e 2 estão implementados na branch de revisão. O projeto ainda não foi implantado em produção. Veja o [README em inglês](README.md) para arquitetura, exemplo JSON **ilustrativo**, limitações e decisões técnicas.

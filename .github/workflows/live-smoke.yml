@@ -1,0 +1,43 @@
+name: Live Open-Meteo smoke test
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/live-smoke.yml"
+      - "scripts/smoke_live.py"
+      - "src/**"
+      - "Dockerfile"
+      - "compose.yaml"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-smoke-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-smoke:
+    name: live-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Build and run API and Redis
+        run: docker compose up -d --build --wait api
+      - name: Validate real Open-Meteo geocoding, weather and Redis hit
+        run: python scripts/smoke_live.py --city Berlin
+      - name: Show container diagnostics on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 100 api redis
+      - name: Clean up containers
+        if: always()
+        run: docker compose down --remove-orphans --volumes
