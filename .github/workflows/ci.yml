@@ -8,6 +8,16 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
@@ -20,5 +30,8 @@ jobs:
         run: ruff check .
       - name: Format
         run: ruff format --check .
-      - name: Test (mocked providers)
+      - name: Test (mocked providers and real Redis)
+        env:
+          RUN_REDIS_TESTS: '1'
+          REDIS_TEST_URL: redis://localhost:6379/15
         run: python -m pytest -q
