@@ -47,3 +47,9 @@ class WeatherResponse(BaseModel):
     current: CurrentWeather
     source: str = "open-meteo"
     cached: bool = False
+
+class CacheMetricsResponse(BaseModel):
+    cache_hits: int = Field(ge=0)
+    cache_misses: int = Field(ge=0)
+    cache_errors: int = Field(ge=0)
+    hit_rate: float = Field(ge=0, le=1)

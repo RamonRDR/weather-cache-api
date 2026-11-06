@@ -16,7 +16,7 @@ from weather_cache_api.open_meteo import (
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
-from weather_cache_api.schemas import WeatherResponse
+from weather_cache_api.schemas import CacheMetricsResponse, WeatherResponse
 from weather_cache_api.service import WeatherService
 
 
@@ -71,3 +71,11 @@ async def get_weather(
         raise HTTPException(status_code=503, detail="Weather provider is unavailable") from exc
     except InvalidProviderResponseError as exc:
         raise HTTPException(status_code=502, detail="Invalid weather provider response") from exc
+
+
+@app.get("/metrics", response_model=CacheMetricsResponse, tags=["operations"])
+async def get_metrics(
+    service: Annotated[WeatherService, Depends(get_weather_service)],
+) -> CacheMetricsResponse:
+    """In-process cache counters for this application worker only."""
+    return service.cache.metrics.snapshot()
