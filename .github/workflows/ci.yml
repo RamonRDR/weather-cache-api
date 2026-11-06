@@ -11,16 +11,6 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -29,6 +19,8 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: python -m pip install -e '.[dev]'
+      - name: Start Redis through Docker Compose
+        run: docker compose up -d --wait redis
       - name: Lint
         run: ruff check .
       - name: Format
@@ -42,3 +34,18 @@ jobs:
         env:
           BENCHMARK_REDIS_URL: redis://localhost:6379/15
         run: python scripts/benchmark.py --samples 10 --delay-ms 20
+      - name: Build and smoke-test the complete Docker Compose stack
+        run: |
+          docker compose up -d --build --wait api
+          curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 2 \
+            http://127.0.0.1:8000/docs -o /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8000/openapi.json \
+            | python -c 'import json, sys; assert "/weather" in json.load(sys.stdin)["paths"]'
+          curl --fail --silent --show-error http://127.0.0.1:8000/metrics \
+            | python -c 'import json, sys; assert "cache_hits" in json.load(sys.stdin)'
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            'http://127.0.0.1:8000/weather?city=%20%20')
+          test "$status" = "422"
+      - name: Stop Docker Compose
+        if: always()
+        run: docker compose down --remove-orphans
