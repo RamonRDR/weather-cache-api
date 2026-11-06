@@ -10,9 +10,7 @@ from weather_cache_api.open_meteo import OpenMeteoClient
 from weather_cache_api.service import WeatherService
 
 GEO = {
-    "results": [
-        {"name": "Itajaí", "country": "Brazil", "latitude": -26.91, "longitude": -48.66}
-    ]
+    "results": [{"name": "Itajaí", "country": "Brazil", "latitude": -26.91, "longitude": -48.66}]
 }
 FORECAST = {
     "current": {

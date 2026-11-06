@@ -36,14 +36,12 @@ class WeatherCache:
             return None
         try:
             return WeatherResponse.model_validate_json(value)
-        except (ValidationError, ValueError):
+        except ValidationError:
             logger.warning("Discarding invalid cache entry for city %r", city)
             return None
 
     async def set(self, city: str, response: WeatherResponse) -> None:
         try:
-            await self.redis.set(
-                self.key(city), response.model_dump_json(), ex=self.ttl_seconds
-            )
+            await self.redis.set(self.key(city), response.model_dump_json(), ex=self.ttl_seconds)
         except Exception:
             logger.warning("Redis SET failed; returning uncached result", exc_info=True)

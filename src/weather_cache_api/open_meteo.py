@@ -81,9 +81,7 @@ class OpenMeteoClient:
             raise InvalidProviderResponseError from exc
         # timezone=GMT makes Open-Meteo's offset-free timestamp represent UTC.
         observed_at = (
-            current.time.replace(tzinfo=UTC)
-            if current.time.tzinfo is None
-            else current.time
+            current.time.replace(tzinfo=UTC) if current.time.tzinfo is None else current.time
         )
         return WeatherResponse(
             location=location,
