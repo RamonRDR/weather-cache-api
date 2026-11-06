@@ -38,7 +38,7 @@ def wait_until_ready(base_url: str, timeout_seconds: float = 45) -> None:
             schema = get_json(base_url, "/openapi.json")
             if "/weather" in schema["paths"] and "/metrics" in schema["paths"]:
                 return
-        except (RuntimeError, KeyError, ValueError):
+        except RuntimeError, KeyError, ValueError:
             pass
         time.sleep(1)
     raise RuntimeError("API did not become ready before the smoke-test deadline")
