@@ -35,3 +35,7 @@ jobs:
           RUN_REDIS_TESTS: '1'
           REDIS_TEST_URL: redis://localhost:6379/15
         run: python -m pytest -q
+      - name: Benchmark (synthetic provider, real Redis)
+        env:
+          BENCHMARK_REDIS_URL: redis://localhost:6379/15
+        run: python scripts/benchmark.py --samples 10 --delay-ms 20
