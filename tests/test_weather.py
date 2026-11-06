@@ -5,7 +5,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from weather_cache_api.cache import WeatherCache
-from weather_cache_api.main import app, get_weather_service
+from weather_cache_api.limiter import RateLimitDecision, RateLimiter
+from weather_cache_api.main import app, enforce_rate_limit, get_rate_limiter, get_weather_service
 from weather_cache_api.open_meteo import OpenMeteoClient
 from weather_cache_api.service import WeatherService
 
@@ -64,6 +65,7 @@ def setup_api():
     http = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     service = WeatherService(OpenMeteoClient(http), WeatherCache(cache_client, 120))
     app.dependency_overrides[get_weather_service] = lambda: service
+    app.dependency_overrides[enforce_rate_limit] = lambda: None
     try:
         client = TestClient(app)
         yield client, cache_client, calls, state
@@ -172,3 +174,62 @@ def test_cache_metrics_count_redis_errors(setup_api):
     assert client.get("/metrics").json() == {
         "cache_hits": 0, "cache_misses": 1, "cache_errors": 2, "hit_rate": 0.0
     }
+
+
+def test_rate_limit_429_with_retry_after(setup_api):
+    client, _, _, _ = setup_api
+
+    class RejectOnThird:
+        def __init__(self):
+            self.count = 0
+
+        async def check(self, ip):
+            assert ip == "testclient"
+            self.count += 1
+            return RateLimitDecision(allowed=self.count <= 2, retry_after_seconds=9)
+
+    limiter = RejectOnThird()
+    app.dependency_overrides.pop(enforce_rate_limit)
+    app.dependency_overrides[get_rate_limiter] = lambda: limiter
+    for _ in range(2):
+        assert client.get("/weather", params={"city": "Itajai"}).status_code == 200
+    blocked = client.get("/weather", params={"city": "Itajai"})
+    assert blocked.status_code == 429
+    assert blocked.headers["retry-after"] == "9"
+
+
+def test_rate_limiter_uses_atomic_script_and_hashed_keys():
+    import asyncio
+
+    class FakeRedisEval:
+        def __init__(self):
+            self.count = 0
+
+        async def eval(self, script, numkeys, key, seconds):
+            assert "INCR" in script and "EXPIRE" in script
+            assert numkeys == 1
+            assert key.startswith("rate:v1:") and "127.0.0.1" not in key
+            assert seconds == 60
+            self.count += 1
+            return [self.count, 42]
+
+    async def verify():
+        limiter = RateLimiter(FakeRedisEval(), requests=2, window_seconds=60)
+        assert (await limiter.check("127.0.0.1")).allowed
+        assert (await limiter.check("127.0.0.1")).allowed
+        third = await limiter.check("127.0.0.1")
+        assert not third.allowed
+        assert third.retry_after_seconds == 42
+
+    asyncio.run(verify())
+
+
+def test_rate_limiter_fail_open_when_redis_is_down():
+    import asyncio
+
+    class BrokenRedis:
+        async def eval(self, *args):
+            raise ConnectionError("redis unavailable")
+
+    decision = asyncio.run(RateLimiter(BrokenRedis(), 1, 60).check("127.0.0.1"))
+    assert decision.allowed

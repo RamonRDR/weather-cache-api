@@ -10,3 +10,5 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     cache_ttl_seconds: int = Field(default=600, ge=1, le=86400)
     http_timeout_seconds: float = Field(default=5.0, gt=0, le=60)
+    rate_limit_requests: int = Field(default=60, ge=1, le=100000)
+    rate_limit_window_seconds: int = Field(default=60, ge=1, le=86400)

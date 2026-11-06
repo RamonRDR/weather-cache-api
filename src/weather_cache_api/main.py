@@ -16,6 +16,7 @@ from weather_cache_api.open_meteo import (
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
+from weather_cache_api.limiter import RateLimiter
 from weather_cache_api.schemas import CacheMetricsResponse, WeatherResponse
 from weather_cache_api.service import WeatherService
 
@@ -36,6 +37,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             app.state.weather_service = WeatherService(
                 OpenMeteoClient(http_client), WeatherCache(cache_client, settings.cache_ttl_seconds)
             )
+            app.state.rate_limiter = RateLimiter(
+                cache_client, settings.rate_limit_requests, settings.rate_limit_window_seconds
+            )
             yield
     finally:
         await cache_client.aclose()
@@ -43,6 +47,25 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def get_weather_service(request: Request) -> WeatherService:
     return request.app.state.weather_service
+
+
+def get_rate_limiter(request: Request) -> RateLimiter:
+    return request.app.state.rate_limiter
+
+
+async def enforce_rate_limit(
+    request: Request,
+    limiter: Annotated[RateLimiter, Depends(get_rate_limiter)],
+) -> None:
+    # Trust the ASGI peer, not an unauthenticated X-Forwarded-For header.
+    client_ip = request.client.host if request.client is not None else "unknown"
+    decision = await limiter.check(client_ip)
+    if not decision.allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+            headers={"Retry-After": str(decision.retry_after_seconds)},
+        )
 
 
 app = FastAPI(
@@ -57,6 +80,7 @@ app = FastAPI(
 async def get_weather(
     city: Annotated[str, Query(min_length=1, max_length=100, description="City to search")],
     service: Annotated[WeatherService, Depends(get_weather_service)],
+    _: Annotated[None, Depends(enforce_rate_limit)],
 ) -> WeatherResponse:
     city = " ".join(city.split())
     if not city:
