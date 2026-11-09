@@ -1,4 +1,10 @@
+<div align="center">
+
 # Weather Cache API
+
+[🇺🇸 English](README.md) · [🇧🇷 Português](docs/localized/README.pt-BR.md) · [🇪🇸 Español](docs/localized/README.es.md)
+
+</div>
 
 [![CI](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml/badge.svg)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
 
@@ -6,7 +12,7 @@
 
 A small REST API that geocodes a city with Open-Meteo, retrieves current weather, and caches successful, validated responses in Redis with a configurable expiration time. This is a backend-focused international portfolio project.
 
-> **Status:** Cycles 1 and 2 implemented on a review branch. This project does not claim production performance figures. Benchmark timings are measured with real Redis and **simulated** upstream latency.
+> **Status:** Cycles 1 and 2 are integrated into the protected `main` branch, after CI validation and a Codex review. This project does not claim production performance figures. Benchmark timings are measured with real Redis and **simulated** upstream latency.
 
 ## Architecture
 
@@ -117,7 +123,7 @@ The benchmark executes `WeatherService` with real Redis and an `httpx.MockTransp
 
 ## Optional live-provider smoke test (GitHub Actions)
 
-The separate [Live Open-Meteo smoke test](.github/workflows/live-smoke.yml) runs on relevant pull-request changes and supports `workflow_dispatch` after the workflow exists on the default branch. It builds the full Compose stack, queries **Berlin** through real Open-Meteo geocoding and weather APIs, then verifies that a second `/weather` request is a Redis cache hit. Results appear in the workflow logs and job summary.
+The separate [Live Open-Meteo smoke test](.github/workflows/live-smoke.yml) runs on relevant pull-request changes and also supports manual `workflow_dispatch` execution from GitHub Actions. It builds the full Compose stack, queries **Berlin** through real Open-Meteo geocoding and weather APIs, then verifies that a second `/weather` request is a Redis cache hit. Results appear in the workflow logs and job summary.
 
 This is an **advisory workflow**, not the required `quality` check. Live provider outages or rate limits can fail it without blocking merge; investigate any failure before approving a release. The workflow uses no API keys or secrets. For equivalent manual execution with running containers, use `python scripts/smoke_live.py --city Berlin`.
 
@@ -133,6 +139,6 @@ This is an **advisory workflow**, not the required `quality` check. Live provide
 ## Design and attribution
 
 Technical rationale: [Architecture decisions](docs/architecture.md).
-Translations: [Português](README.pt-BR.md) · [Español](README.es.md).
+Translations: [Português](docs/localized/README.pt-BR.md) · [Español](docs/localized/README.es.md).
 Providers: [Open-Meteo Weather](https://open-meteo.com/en/docs) and [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api). Check [Open-Meteo terms](https://open-meteo.com/en/terms) before commercial use; credit the provider in public deployments.
-Code: MIT License.
+Code: [MIT License](LICENSE).
