@@ -8,6 +8,9 @@
 
 [![CI](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml/badge.svg)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)](https://fastapi.tiangolo.com/)
+[![Redis](https://img.shields.io/badge/Redis-cache-DC382D)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED)](https://www.docker.com/)
 [![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 </div>
