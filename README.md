@@ -1,12 +1,16 @@
 <div align="center">
 
-# Weather Cache API
+# Weather Cache API 🌤️
+
+**Weather on demand. Smart caching. Built with Python and Redis.**
 
 [🇺🇸 English](README.md) · [🇧🇷 Português](docs/localized/README.pt-BR.md) · [🇪🇸 Español](docs/localized/README.es.md)
 
-</div>
-
 [![CI](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml/badge.svg)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
+[![Python 3.14](https://img.shields.io/badge/Python-3.14-blue)](https://www.python.org/)
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+</div>
 
 **Python 3.14 · FastAPI · Pydantic · httpx · Open-Meteo · Redis**
 
