@@ -38,6 +38,6 @@
 
 Unit tests mock upstream HTTP and cache responses. Two opt-in tests verify real Redis TTL expiry and the rate-limiter window. GitHub Actions runs these tests with Redis 7 and Python 3.14, then executes the synthetic benchmark. All numeric results must come from actual CI logs or a local run, never estimates.
 
-Future work: production-like reverse-proxy deployment checks, observability aggregation and a Codex review before merging into `main`. A separate advisory Actions workflow performs live Open-Meteo smoke validation; its observed outcome must be checked in the GitHub run logs.
+Status: Cycles 1 and 2 are integrated into the protected `main` branch after CI validation and Codex review. Future work includes production-like reverse-proxy deployment checks and observability aggregation. A separate advisory Actions workflow performs live Open-Meteo smoke validation; check its outcome in GitHub run logs.
 
 Measured synthetic CI run: [benchmark methodology and observed results](performance.md).
