@@ -8,12 +8,18 @@
 
 [![CI](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml/badge.svg)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)](https://fastapi.tiangolo.com/)
-[![Redis](https://img.shields.io/badge/Redis-cache-DC382D)](https://redis.io/)
-[![Docker](https://img.shields.io/badge/Docker-ready-2496ED)](https://www.docker.com/)
-[![pytest](https://img.shields.io/badge/pytest-17%20tests-0A9EDC)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
-[![Ruff](https://img.shields.io/badge/Ruff-lint%20%26%20format-7C3AED)](https://docs.astral.sh/ruff/)
 [![MIT](https://img.shields.io/badge/license-MIT-green)](../../LICENSE)
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-REST-009688)](https://fastapi.tiangolo.com/)
+[![Pydantic v2](https://img.shields.io/badge/Pydantic-v2-E92063)](https://docs.pydantic.dev/latest/)
+[![httpx](https://img.shields.io/badge/httpx-async-5165B6)](https://www.python-httpx.org/)
+[![Redis 7](https://img.shields.io/badge/Redis-7-DC382D)](https://redis.io/)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED)](https://docs.docker.com/compose/)
+[![Open-Meteo](https://img.shields.io/badge/Open--Meteo-weather-2875C1)](https://open-meteo.com/en/docs)
+
+[![pytest](https://img.shields.io/badge/pytest-17%20passing-0A9EDC)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
+[![Ruff](https://img.shields.io/badge/Ruff-lint%20%26%20format-7C3AED)](https://docs.astral.sh/ruff/)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-documented-6BA539)](https://github.com/RamonRDR/weather-cache-api/actions/workflows/ci.yml)
 
 </div>
 
@@ -117,6 +123,8 @@ ruff check .
 ruff format --check .
 python -m pytest -q
 ```
+
+El badge de pytest muestra una cantidad **estática**, confirmada por el último CI aprobado (`17 passed`). Si cambia la suite de pruebas, actualice la cantidad en los tres READMEs después de verificar la ejecución de `quality`.
 
 Las pruebas unitarias simulan HTTP y Redis. Las pruebas de integración utilizan Redis real para verificar el vencimiento del TTL y el restablecimiento del límite tras la ventana de tiempo. GitHub Actions inicia Redis 7 y ejecuta ambas con Python 3.14; no se necesitan consultas meteorológicas reales en esta etapa.
 
